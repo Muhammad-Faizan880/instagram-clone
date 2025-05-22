@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { AtSign, Lock, User, Eye, EyeOff, ArrowRight } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 const Register = () => {
   const [show, setShow] = useState(false);
@@ -13,6 +13,9 @@ const Register = () => {
   });
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     setTimeout(() => setShow(true), 100);
@@ -87,6 +90,7 @@ const Register = () => {
       
       // Registration successful
       setSuccess('Registration successful! You can now login.');
+      navigate("/signin")
       // Reset form
       setFormState({
         username: '',
