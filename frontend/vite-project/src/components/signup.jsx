@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { AtSign, Lock, User, Eye, EyeOff, ArrowRight } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
+import { toast } from "react-toastify";
 
 const Register = () => {
   const [show, setShow] = useState(false);
@@ -55,55 +56,52 @@ const Register = () => {
     return true;
   };
 
-  const handleSubmit = async (e) => {
-    if (e && e.preventDefault) e.preventDefault();
-    
-    // Clear previous states
-    setError('');
-    setSuccess('');
-    
-    // Validate form
-    if (!validateForm()) {
-      return;
+ const handleSubmit = async (e) => {
+  if (e && e.preventDefault) e.preventDefault();
+
+  // Clear previous messages
+  setError('');
+  setSuccess('');
+
+  // Validate form
+  if (!validateForm()) {
+    return;
+  }
+
+  setLoading(true);
+
+  try {
+    const response = await fetch('http://localhost:8000/api/v1/user/register', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        username: formState.username,
+        email: formState.email,
+        password: formState.password
+      }),
+    });
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.message || 'Registration failed');
     }
-    
-    setLoading(true);
-    
-    try {
-      const response = await fetch('http://localhost:8000/api/v1/user/register', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          username: formState.username,
-          email: formState.email,
-          password: formState.password
-        }),
-      });
-      
-      const data = await response.json();
-      
-      if (!response.ok) {
-        throw new Error(data.message || 'Registration failed');
-      }
-      
-      // Registration successful
-      setSuccess('Registration successful! You can now login.');
-      navigate("/signin")
-      // Reset form
-      setFormState({
-        username: '',
-        email: '',
-        password: ''
-      });
-      
-    } catch (err) {
-      setError(err.message || 'An error occurred during registration');
-    } finally {
-      setLoading(false);
-    }
-  };
+    toast.success('Registration successful! You can now login.');
+    navigate("/signin");
+
+    setFormState({
+      username: '',
+      email: '',
+      password: ''
+    });
+
+  } catch (err) {
+    toast.error(err.message || 'An error occurred during registration');
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <>
