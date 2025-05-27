@@ -12,21 +12,15 @@ import {
 } from "lucide-react";
 import { toast } from "react-toastify";
 import axios from "axios";
+import { useSelector } from "react-redux";
 
-const items = [
-  { name: "Home", icon: <Home size={24} /> },
-  { name: "Search", icon: <Search size={24} /> },
-  { name: "Explore", icon: <Compass size={24} /> },
-  { name: "Reels", icon: <Clapperboard size={24} /> },
-  { name: "Messages", icon: <MessageCircle size={24} /> },
-  { name: "Notifications", icon: <Heart size={24} /> },
-  { name: "Create", icon: <PlusSquare size={24} /> },
-  { name: "Profile", icon: <User size={24} /> },
-  { name: "Logout", icon: <LogOut size={24} /> },
-];
+
 
 const Sidebar = () => {
   const navigate = useNavigate();
+const {user} = useSelector(store=>store.auth)
+console.log("find image", user)
+
   const logoutHandler = async () => {
     try {
       console.log("Logout initiated...");
@@ -55,6 +49,31 @@ const Sidebar = () => {
   const sidebarHandler = (name) => {
     if (name === "Logout") logoutHandler();
   };
+
+
+  const items = [
+    { name: "Home", icon: <Home size={24} /> },
+    { name: "Search", icon: <Search size={24} /> },
+    { name: "Explore", icon: <Compass size={24} /> },
+    { name: "Reels", icon: <Clapperboard size={24} /> },
+    { name: "Messages", icon: <MessageCircle size={24} /> },
+    { name: "Notifications", icon: <Heart size={24} /> },
+    { name: "Create", icon: <PlusSquare size={24} /> },
+    {
+      name: "Profile",
+      icon: user?.profilePicture ? (
+        <img
+          src={user.profilePicture}
+          alt="Profile"
+          className="w-6 h-6 rounded-full object-cover"
+        />
+      ) : (
+        <User size={24} />
+      ),
+    },
+    { name: "Logout", icon: <LogOut size={24} /> },
+  ];
+
 
   return (
     <>

@@ -3,6 +3,8 @@ import axios from "axios";
 import { toast } from "react-toastify";
 import { User, Lock, Eye, EyeOff, ArrowRight } from "lucide-react";
 import { Link, useNavigate } from 'react-router-dom';
+import { useDispatch } from "react-redux";
+import { setAuthUser } from "../redux/authSlice";
 
 function Signin() {
   const [formState, setFormState] = useState({
@@ -21,7 +23,7 @@ function Signin() {
     }));
   };
   const navigate = useNavigate();
-
+const dispatch = useDispatch()
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -39,6 +41,7 @@ function Signin() {
         toast.success(response.data.message || "Login successful!", {
           position: "top-right",
         });
+        dispatch(setAuthUser(response.data.user))
         navigate("/landing")
         console.log("User data", response.data);
       }

@@ -1,8 +1,7 @@
 import { User } from "../models/user.model.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import getDataUri from "../utils/datauri.js";
-import cloudinary from "../utils/cloudinary.js";
+import { uploadProfilePicture } from "../utils/imageUpload.js";
 
 // Register ............................
 export const register = async (req, res) => {
@@ -173,14 +172,12 @@ export const editProfile = async (req, res) => {
   try {
     const userId = req.id;
     const { gender, bio } = req.body;
-    const profilePicture = req.file;
+    let profilePictureUrl;
 
-    let cloudResponse;
-
-    // Upload profile picture to Cloudinary if provided
-    if (profilePicture) {
-      const fileUri = getDataUri(profilePicture);
-      cloudResponse = await cloudinary.uploader.upload(fileUri);
+    // Upload profile picture if provided
+    if (req.file) {
+      const fileName = `${Date.now()}_${req.file.originalname}`;
+      profilePictureUrl = await uploadProfilePicture(req.file.buffer, fileName);
     }
 
     // Find user
@@ -192,10 +189,10 @@ export const editProfile = async (req, res) => {
       });
     }
 
-    // Update fields if provided
+    // Update fields
     if (bio) user.bio = bio;
     if (gender) user.gender = gender;
-    if (profilePicture) user.profilePicture = cloudResponse.secure_url;
+    if (profilePictureUrl) user.profilePicture = profilePictureUrl;
 
     await user.save();
 
