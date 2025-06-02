@@ -8,18 +8,16 @@ import {
   Heart,
   PlusSquare,
   User,
-  LogOut
+  LogOut,
 } from "lucide-react";
 import { toast } from "react-toastify";
 import axios from "axios";
 import { useSelector } from "react-redux";
 
-
-
 const Sidebar = () => {
   const navigate = useNavigate();
-const {user} = useSelector(store=>store.auth)
-console.log("find image", user)
+  const { user } = useSelector((store) => store.auth);
+  console.log("find image", user);
 
   const logoutHandler = async () => {
     try {
@@ -50,7 +48,6 @@ console.log("find image", user)
     if (name === "Logout") logoutHandler();
   };
 
-
   const items = [
     { name: "Home", icon: <Home size={24} /> },
     { name: "Search", icon: <Search size={24} /> },
@@ -73,7 +70,6 @@ console.log("find image", user)
     },
     { name: "Logout", icon: <LogOut size={24} /> },
   ];
-
 
   return (
     <>

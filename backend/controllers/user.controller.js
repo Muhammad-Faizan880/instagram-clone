@@ -1,7 +1,9 @@
 import { User } from "../models/user.model.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import { uploadProfilePicture } from "../utils/imageUpload.js";
+import { uploadProfilePicture } from "../utils/uploadProfilePicture.js";
+import { response } from "express";
+import { json } from "express";
 
 // Register ............................
 export const register = async (req, res) => {
@@ -170,17 +172,19 @@ export const getProfile = async (req, res) => {
 
 export const editProfile = async (req, res) => {
   try {
+    console.log("REQ.ID:", req.id);
+    console.log("REQ.BODY:", req.body);
+    console.log("REQ.FILE:", req.file);
+
     const userId = req.id;
     const { gender, bio } = req.body;
     let profilePictureUrl;
 
-    // Upload profile picture if provided
     if (req.file) {
       const fileName = `${Date.now()}_${req.file.originalname}`;
       profilePictureUrl = await uploadProfilePicture(req.file.buffer, fileName);
     }
 
-    // Find user
     const user = await User.findById(userId);
     if (!user) {
       return res.status(404).json({
@@ -189,7 +193,6 @@ export const editProfile = async (req, res) => {
       });
     }
 
-    // Update fields
     if (bio) user.bio = bio;
     if (gender) user.gender = gender;
     if (profilePictureUrl) user.profilePicture = profilePictureUrl;
@@ -208,7 +211,8 @@ export const editProfile = async (req, res) => {
       success: false,
     });
   }
-};
+}
+
 
 // suggested Users ......................................
 
