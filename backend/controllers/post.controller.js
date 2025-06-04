@@ -1,6 +1,64 @@
 import sharp from "sharp";
 import { Post } from "../models/post.model.js";
 import { User } from "../models/user.model.js";
+import imagekit from "../utils/imageKit.js";
+
+// export const addNewPost = async (req, res) => {
+//   try {
+//     const { caption } = req.body;
+//     const image = req.file;
+//     const authorId = req.id;
+
+//     if (!image) {
+//       return res.status(400).json({ message: "Image Required!" });
+//     }
+
+//     // Resize and optimize the image using sharp
+//     const optimizedImageBuffer = await sharp(image.buffer)
+//       .resize({ width: 800, height: 800, fit: "inside" })
+//       .toFormat("jpeg", { quality: 90 })
+//       .toBuffer();
+
+//     // Convert buffer to Data URI
+//     const fileUri = `data:image/jpeg;base64,${optimizedImageBuffer.toString(
+//       "base64"
+//     )}`;
+
+//     // Upload to Cloudinary
+//     const cloudResponse = await cloudinary.uploader.upload(fileUri);
+
+//     // Create new post
+//     const post = await Post.create({
+//       caption,
+//       image: cloudResponse.secure_url,
+//       author: authorId,
+//     });
+
+//     // Push post to user's posts array
+//     const user = await User.findById(authorId);
+//     if (user) {
+//       user.posts.push(post._id);
+//       await user.save();
+//     }
+
+//     // Populate author data excluding password
+//     await post.populate({ path: "author", select: "-password" });
+
+//     return res.status(201).json({
+//       message: "New Post Added!",
+//       success: true,
+//       post,
+//     });
+//   } catch (error) {
+//     console.error("Error in addNewPost:", error);
+//     return res.status(500).json({
+//       message: "Something went wrong while adding the post.",
+//       success: false,
+//     });
+//   }
+// };
+
+// all possts
 
 export const addNewPost = async (req, res) => {
   try {
@@ -18,18 +76,18 @@ export const addNewPost = async (req, res) => {
       .toFormat("jpeg", { quality: 90 })
       .toBuffer();
 
-    // Convert buffer to Data URI
-    const fileUri = `data:image/jpeg;base64,${optimizedImageBuffer.toString(
-      "base64"
-    )}`;
-
-    // Upload to Cloudinary
-    const cloudResponse = await cloudinary.uploader.upload(fileUri);
+    // Upload to ImageKit (base64 string)
+    const uploadResponse = await imagekit.upload({
+      file: optimizedImageBuffer.toString("base64"), 
+      fileName: `${Date.now()}_post.jpg`,
+      folder: "/posts", 
+      useUniqueFileName: true,
+    });
 
     // Create new post
     const post = await Post.create({
       caption,
-      image: cloudResponse.secure_url,
+      image: uploadResponse.url,
       author: authorId,
     });
 
@@ -57,7 +115,6 @@ export const addNewPost = async (req, res) => {
   }
 };
 
-// all possts
 
 export const getAllPost = async (req, res) => {
   try {
